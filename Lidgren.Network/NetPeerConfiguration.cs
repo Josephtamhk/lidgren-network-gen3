@@ -138,6 +138,8 @@ namespace Lidgren.Network {
             m_minResendInterval = 0.01f;
             m_maxResendInterval = 0.5f;
             m_networkLoopIntervalMicroSecond = 1000;
+
+            m_dualStack = true;
         }
 
         internal void Lock () {

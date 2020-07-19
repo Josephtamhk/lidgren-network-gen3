@@ -26,6 +26,8 @@ namespace Lidgren.Network {
         private NetUPnP m_upnp;
         internal bool m_needFlushSendQueue;
 
+        internal bool m_dualMode;
+
         internal readonly NetPeerConfiguration m_configuration;
         private readonly NetQueue<NetIncomingMessage> m_releasedIncomingMessages;
         internal readonly NetQueue<NetTuple<NetEndPoint, NetOutgoingMessage>> m_unsentUnconnectedMessages;
@@ -117,7 +119,7 @@ namespace Lidgren.Network {
             }
             m_lastSocketBind = now;
 
-            using (var mutex = new CreateMutex("Global\\lidgrenSocketBind")) {
+            using (var mutex = CreateMutex("Global\\lidgrenSocketBind")) {
                 try {
                     mutex.WaitOne();
 
@@ -132,11 +134,14 @@ namespace Lidgren.Network {
                     m_socket.Ttl = m_configuration.m_socketTtl;
                     m_socket.Blocking = false;
 
+                    m_dualMode = false;
+
                     if (m_configuration.DualStack) {
                         if (m_configuration.LocalAddress.AddressFamily != AddressFamily.InterNetworkV6) {
                             LogWarning("Configuration specifies Dual Stack but does not use IPv6 local address; Dual stack will not work.");
                         } else {
                             m_socket.DualMode = true;
+                            m_dualMode = true;
                         }
                     }
 

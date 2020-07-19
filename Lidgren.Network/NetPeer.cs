@@ -313,7 +313,7 @@ namespace Lidgren.Network
 		{
 			if (remoteEndPoint == null)
 				throw new ArgumentNullException("remoteEndPoint");
-            if(m_configuration.DualStack)
+            if(m_dualMode)
                 remoteEndPoint = NetUtility.MapToIPv6(remoteEndPoint);
 
 			lock (m_connections)
