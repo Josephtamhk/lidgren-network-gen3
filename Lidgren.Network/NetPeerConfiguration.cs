@@ -46,6 +46,8 @@ namespace Lidgren.Network {
         private string m_networkThreadName;
         private IPAddress m_localAddress;
         private IPAddress m_broadcastAddress;
+        private bool m_dualStack;
+
         internal bool m_acceptIncomingConnections;
         internal int m_maximumConnections;
         internal int m_defaultOutgoingMessageCapacity;
@@ -62,15 +64,8 @@ namespace Lidgren.Network {
         internal int m_port;
         internal int m_receiveBufferSize;
         internal int m_sendBufferSize;
-        internal short m_socketTtl;
         internal float m_resendHandshakeInterval;
         internal int m_maximumHandshakeAttempts;
-
-        internal bool m_allowBadPingPong;
-        internal float m_minResendInterval;
-        internal float m_maxResendInterval;
-
-        internal int m_networkLoopIntervalMicroSecond;
 
         // bad network simulation
         internal float m_loss;
@@ -83,6 +78,13 @@ namespace Lidgren.Network {
         internal bool m_autoExpandMTU;
         internal float m_expandMTUFrequency;
         internal int m_expandMTUFailAttempts;
+
+        // Detail
+        internal short m_socketTtl;
+        internal bool m_allowBadPingPong;
+        internal float m_minResendInterval;
+        internal float m_maxResendInterval;
+        internal int m_networkLoopIntervalMicroSecond;
 
         /// <summary>
         /// NetPeerConfiguration constructor
@@ -106,7 +108,6 @@ namespace Lidgren.Network {
             m_port = 0;
             m_receiveBufferSize = 131071;
             m_sendBufferSize = 131071;
-            m_socketTtl = 64;
             m_acceptIncomingConnections = false;
             m_maximumConnections = 32;
             m_defaultOutgoingMessageCapacity = 16;
@@ -114,16 +115,10 @@ namespace Lidgren.Network {
             m_connectionTimeout = 25.0f;
             m_useMessageRecycling = true;
             m_recycledCacheMaxCount = 64;
-            m_resendHandshakeInterval = 1.0f;
-            m_maximumHandshakeAttempts = 30;
+            m_resendHandshakeInterval = 3.0f;
+            m_maximumHandshakeAttempts = 5;
             m_autoFlushSendQueue = true;
             m_suppressUnreliableUnorderedAcks = false;
-
-            m_allowBadPingPong = true;
-            m_minResendInterval = 0.01f;
-            m_maxResendInterval = 0.5f;
-
-            m_networkLoopIntervalMicroSecond = 1000;
 
             m_maximumTransmissionUnit = kDefaultMTU;
             m_autoExpandMTU = false;
@@ -137,6 +132,12 @@ namespace Lidgren.Network {
             m_duplicates = 0.0f;
 
             m_isLocked = false;
+
+            m_socketTtl = 64;
+            m_allowBadPingPong = true;
+            m_minResendInterval = 0.01f;
+            m_maxResendInterval = 0.5f;
+            m_networkLoopIntervalMicroSecond = 1000;
         }
 
         internal void Lock () {
@@ -148,6 +149,54 @@ namespace Lidgren.Network {
         /// </summary>
         public string AppIdentifier {
             get { return m_appIdentifier; }
+        }
+
+        /// <summary>
+        /// Gets or sets the ttl of socket.
+        /// </summary>
+        public short SocketTTL {
+            get { return m_socketTtl; }
+            set {
+                if (m_isLocked)
+                    throw new NetException(c_isLockedMessage);
+                m_socketTtl = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the connection allows bad ping pong
+        /// </summary>
+        public bool AllowBadPingPong {
+            get { return m_allowBadPingPong; }
+            set { m_allowBadPingPong = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the min resend interval for reliable packet
+        /// </summary>
+        public float MinResendInterval {
+            get { return m_minResendInterval; }
+            set { m_minResendInterval = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the max resend interval for reliable packet
+        /// </summary>
+        public float MaxResendInterval {
+            get { return m_maxResendInterval; }
+            set { m_maxResendInterval = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the network loop interval
+        /// </summary>
+        public int NetworkLoopIntervalMicroSecond {
+            get { return m_networkLoopIntervalMicroSecond; }
+            set {
+                if (m_isLocked)
+                    throw new NetException(c_isLockedMessage);
+                m_networkLoopIntervalMicroSecond = value;
+            }
         }
 
         /// <summary>
@@ -324,6 +373,20 @@ namespace Lidgren.Network {
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the library should use IPv6 dual stack mode.
+        /// If you enable this you should make sure that the <see cref="LocalAddress"/> is an IPv6 address.
+        /// Cannot be changed once NetPeer is initialized.
+        /// </summary>
+        public bool DualStack {
+            get { return m_dualStack; }
+            set {
+                if (m_isLocked)
+                    throw new NetException(c_isLockedMessage);
+                m_dualStack = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the local broadcast address to use when broadcasting
         /// </summary>
         public IPAddress BroadcastAddress {
@@ -368,18 +431,6 @@ namespace Lidgren.Network {
                 if (m_isLocked)
                     throw new NetException(c_isLockedMessage);
                 m_sendBufferSize = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the ttl of socket.
-        /// </summary>
-        public short SocketTTL {
-            get { return m_socketTtl; }
-            set {
-                if (m_isLocked)
-                    throw new NetException(c_isLockedMessage);
-                m_socketTtl = value;
             }
         }
 
@@ -437,38 +488,6 @@ namespace Lidgren.Network {
         public int ExpandMTUFailAttempts {
             get { return m_expandMTUFailAttempts; }
             set { m_expandMTUFailAttempts = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets whether the connection allows bad ping pong
-        /// </summary>
-        public bool AllowBadPingPong {
-            get { return m_allowBadPingPong; }
-            set { m_allowBadPingPong = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the min resend interval for reliable packet
-        /// </summary>
-        public float MinResendInterval {
-            get { return m_minResendInterval; }
-            set { m_minResendInterval = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the max resend interval for reliable packet
-        /// </summary>
-        public float MaxResendInterval {
-            get { return m_maxResendInterval; }
-            set { m_maxResendInterval = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets the network loop interval
-        /// </summary>
-        public int NetworkLoopIntervalMicroSecond {
-            get { return m_networkLoopIntervalMicroSecond; }
-            set { m_networkLoopIntervalMicroSecond = value; }
         }
 
 #if DEBUG
