@@ -153,7 +153,7 @@ namespace Lidgren.Network
                     targetCopy.Port = target.Port;
                     m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, true);
                 }
-                else if(m_configuration.DualStack && m_configuration.LocalAddress.AddressFamily == AddressFamily.InterNetworkV6)
+                else if(m_dualMode)
                     NetUtility.CopyEndpoint(target, targetCopy); //Maps to IPv6 for Dual Mode
                 else
                 {

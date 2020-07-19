@@ -80,10 +80,10 @@ namespace Lidgren.Network
 			double avgRtt = m_averageRoundtripTime;
 			if (avgRtt <= 0)
 				avgRtt = 0.1; // "default" resend is based on 100 ms roundtrip time
-			return 0.025 + (avgRtt * 2.1); // 25 ms + double rtt
-		}
+            return Math.Max(m_peerConfiguration.m_minResendInterval, Math.Min(m_peerConfiguration.m_maxResendInterval, 0.025 + (avgRtt * 2.1))); // 25 ms + double rtt
+        }
 
-		internal NetConnection(NetPeer peer, NetEndPoint remoteEndPoint)
+        internal NetConnection(NetPeer peer, NetEndPoint remoteEndPoint)
 		{
 			m_peer = peer;
 			m_peerConfiguration = m_peer.Configuration;

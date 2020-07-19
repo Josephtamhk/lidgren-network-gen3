@@ -81,10 +81,16 @@ namespace Lidgren.Network
 		internal float m_expandMTUFrequency;
 		internal int m_expandMTUFailAttempts;
 
-		/// <summary>
-		/// NetPeerConfiguration constructor
-		/// </summary>
-		public NetPeerConfiguration(string appIdentifier)
+        internal short m_socketTtl;
+        internal bool m_allowBadPingPong;
+        internal float m_minResendInterval;
+        internal float m_maxResendInterval;
+        internal int m_networkLoopIntervalMicroSecond;
+
+        /// <summary>
+        /// NetPeerConfiguration constructor
+        /// </summary>
+        public NetPeerConfiguration(string appIdentifier)
 		{
 			if (string.IsNullOrEmpty(appIdentifier))
 				throw new NetException("App identifier must be at least one character long");
@@ -129,9 +135,63 @@ namespace Lidgren.Network
 			m_duplicates = 0.0f;
 
 			m_isLocked = false;
-		}
 
-		internal void Lock()
+            m_socketTtl = 64;
+            m_allowBadPingPong = true;
+            m_minResendInterval = 0.01f;
+            m_maxResendInterval = 0.5f;
+            m_networkLoopIntervalMicroSecond = 1000;
+        }
+
+        /// <summary>
+        /// Gets or sets the ttl of socket.
+        /// </summary>
+        public short SocketTTL {
+            get { return m_socketTtl; }
+            set {
+                if (m_isLocked)
+                    throw new NetException(c_isLockedMessage);
+                m_socketTtl = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the connection allows bad ping pong
+        /// </summary>
+        public bool AllowBadPingPong {
+            get { return m_allowBadPingPong; }
+            set { m_allowBadPingPong = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the min resend interval for reliable packet
+        /// </summary>
+        public float MinResendInterval {
+            get { return m_minResendInterval; }
+            set { m_minResendInterval = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the max resend interval for reliable packet
+        /// </summary>
+        public float MaxResendInterval {
+            get { return m_maxResendInterval; }
+            set { m_maxResendInterval = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the network loop interval
+        /// </summary>
+        public int NetworkLoopIntervalMicroSecond {
+            get { return m_networkLoopIntervalMicroSecond; }
+            set {
+                if (m_isLocked)
+                    throw new NetException(c_isLockedMessage);
+                m_networkLoopIntervalMicroSecond = value;
+            }
+        }
+
+        internal void Lock()
 		{
 			m_isLocked = true;
 		}
