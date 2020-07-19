@@ -62,6 +62,7 @@ namespace Lidgren.Network {
         internal int m_port;
         internal int m_receiveBufferSize;
         internal int m_sendBufferSize;
+        internal short m_socketTtl;
         internal float m_resendHandshakeInterval;
         internal int m_maximumHandshakeAttempts;
 
@@ -105,6 +106,7 @@ namespace Lidgren.Network {
             m_port = 0;
             m_receiveBufferSize = 131071;
             m_sendBufferSize = 131071;
+            m_socketTtl = 64;
             m_acceptIncomingConnections = false;
             m_maximumConnections = 32;
             m_defaultOutgoingMessageCapacity = 16;
@@ -366,6 +368,18 @@ namespace Lidgren.Network {
                 if (m_isLocked)
                     throw new NetException(c_isLockedMessage);
                 m_sendBufferSize = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the ttl of socket.
+        /// </summary>
+        public short SocketTTL {
+            get { return m_socketTtl; }
+            set {
+                if (m_isLocked)
+                    throw new NetException(c_isLockedMessage);
+                m_socketTtl = value;
             }
         }
 

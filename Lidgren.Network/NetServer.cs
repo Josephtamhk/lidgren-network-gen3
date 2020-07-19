@@ -25,7 +25,7 @@ namespace Lidgren.Network
 		public void SendToAll(NetOutgoingMessage msg, NetDeliveryMethod method)
 		{
 			// Modifying m_connections will modify the list of the connections of the NetPeer. Do only reads here
-			var all = m_connections;
+			var all = Connections;
 			if (all.Count <= 0) {
 				if (msg.m_isSent == false)
 					Recycle(msg);
@@ -44,7 +44,7 @@ namespace Lidgren.Network
 		public void SendToAll(NetOutgoingMessage msg, NetDeliveryMethod method, int sequenceChannel)
 		{
 			// Modifying m_connections will modify the list of the connections of the NetPeer. Do only reads here
-			var all = m_connections;
+			var all = Connections;
 			if (all.Count <= 0) {
 				if (msg.m_isSent == false)
 					Recycle(msg);
@@ -64,7 +64,7 @@ namespace Lidgren.Network
 		public void SendToAll(NetOutgoingMessage msg, NetConnection except, NetDeliveryMethod method, int sequenceChannel)
 		{
 			// Modifying m_connections will modify the list of the connections of the NetPeer. Do only reads here
-			var all = m_connections;
+			var all = Connections;
 			if (all.Count <= 0) {
 				if (msg.m_isSent == false)
 					Recycle(msg);
