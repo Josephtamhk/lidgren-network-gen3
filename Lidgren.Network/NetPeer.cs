@@ -88,20 +88,21 @@ namespace Lidgren.Network
 			}
 		}
 
-        /// <summary>
-        /// Gets the number of active connections
-        /// </summary>
-        public int ConnectionsCount {
-            get {
+		/// <summary>
+		/// Gets the number of active connections
+		/// </summary>
+		public int ConnectionsCount
+		{
+			get {
                 lock (m_connections)
                     return m_connections.Count;
             }
-        }
+		}
 
-        /// <summary>
-        /// Statistics on this NetPeer since it was initialized
-        /// </summary>
-        public NetPeerStatistics Statistics
+		/// <summary>
+		/// Statistics on this NetPeer since it was initialized
+		/// </summary>
+		public NetPeerStatistics Statistics
 		{
 			get { return m_statistics; }
 		}

@@ -40,6 +40,11 @@ namespace Lidgren.Network {
         private List<NetTuple<SynchronizationContext, SendOrPostCallback>> m_receiveCallbacks;
 
         /// <summary>
+        /// Get the frame counter
+        /// </summary>
+        public uint FrameCounter { get { return m_frameCounter; } }
+
+        /// <summary>
         /// Gets the socket, if Start() has been called
         /// </summary>
         public Socket Socket { get { return m_socket; } }
@@ -284,18 +289,19 @@ namespace Lidgren.Network {
                     foreach (var kvp in m_handshakes) {
                         NetConnection conn = kvp.Value as NetConnection;
 #if DEBUG
-                        // sanity check
-                        if (kvp.Key != kvp.Key)
-                            LogWarning("Sanity fail! Connection in handshake list under wrong key!");
+						// sanity check
+						if (kvp.Key != kvp.Key)
+							LogWarning("Sanity fail! Connection in handshake list under wrong key!");
 #endif
                         conn.UnconnectedHeartbeat(now);
                         if (conn.m_status == NetConnectionStatus.Connected || conn.m_status == NetConnectionStatus.Disconnected) {
 #if DEBUG
-                            // sanity check
-                            if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndPoint)) {
-                                LogWarning("Sanity fail! Handshakes list contained disconnected connection!");
-                                m_handshakes.Remove(conn.RemoteEndPoint);
-                            }
+							// sanity check
+							if (conn.m_status == NetConnectionStatus.Disconnected && m_handshakes.ContainsKey(conn.RemoteEndPoint))
+							{
+								LogWarning("Sanity fail! Handshakes list contained disconnected connection!");
+								m_handshakes.Remove(conn.RemoteEndPoint);
+							}
 #endif
                             break; // collection has been modified
                         }
@@ -303,7 +309,7 @@ namespace Lidgren.Network {
                 }
 
 #if DEBUG
-                SendDelayedPackets();
+				SendDelayedPackets();
 #endif
 
                 // update m_executeFlushSendQueue
